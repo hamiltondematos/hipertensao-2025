@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Classificação da PA e conduta — Diretriz 2025</title>
+<style>
+  :root{
+    --cream:#FCF6F1; --surface:#FFFFFF; --ink:#2A2320; --muted:#7A6A61;
+    --coral:#E05D34; --coral-deep:#BE4527; --navy:#23406B; --peach:#FBEADF; --line:#EAD7C9;
+    --normal:#2E7D5B; --pre:#D98A2B; --e1:#E05D34; --e2:#C0402A; --e3:#8E2A1C;
+    --shadow:rgba(120,70,40,.16); --grid:#E9D8CB; --dot-ring:#2A2320;
+  }
+  /* Tema padrão: claro. O escuro só é aplicado por escolha explícita (botão) ou pelo host do artifact. */
+  :root[data-theme="light"]{
+    --cream:#FCF6F1; --surface:#FFFFFF; --ink:#2A2320; --muted:#7A6A61;
+    --coral:#E05D34; --coral-deep:#BE4527; --navy:#23406B; --peach:#FBEADF; --line:#EAD7C9;
+    --normal:#2E7D5B; --pre:#D98A2B; --e1:#E05D34; --e2:#C0402A; --e3:#8E2A1C;
+    --shadow:rgba(120,70,40,.16); --grid:#E9D8CB; --dot-ring:#2A2320;
+  }
+  :root[data-theme="dark"]{
+    --cream:#1A1613; --surface:#241D19; --ink:#F3E9E1; --muted:#B39C90;
+    --coral:#F07A52; --coral-deep:#EE6A3E; --navy:#8AA8D6; --peach:#2E231D; --line:#3A2D26;
+    --normal:#43A97A; --pre:#E6A344; --e1:#F07A52; --e2:#DA5638; --e3:#C0402A;
+    --shadow:rgba(0,0,0,.4); --grid:#3A2D26; --dot-ring:#F3E9E1;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--cream); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding:clamp(14px,3vw,34px);
+  }
+  .wrap{max-width:1120px;margin:0 auto}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+  .tnum{font-variant-numeric:tabular-nums}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin:0 0 6px}
+  h1{font-family:Georgia,serif;font-weight:700;font-size:clamp(22px,3.4vw,32px);margin:0;color:var(--ink);text-wrap:balance;line-height:1.15}
+  .sub{color:var(--muted);font-size:14px;margin:6px 0 0;max-width:60ch}
+  .themebtn{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;
+    padding:8px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .themebtn:hover{color:var(--ink)}
+
+  .grid{display:grid;grid-template-columns:1fr 1.15fr;gap:22px;align-items:start}
+  @media (max-width:860px){.grid{grid-template-columns:1fr}}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px -18px var(--shadow)}
+  .panel h2{font-family:Georgia,serif;font-size:15px;margin:0 0 16px;color:var(--coral-deep);font-weight:700;letter-spacing:.01em}
+
+  .ctrl{margin-bottom:22px}
+  .ctrl:last-child{margin-bottom:4px}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-head label{font-size:14px;font-weight:600;color:var(--ink)}
+  .val{font-family:Georgia,serif;font-size:30px;font-weight:700;color:var(--coral);line-height:1}
+  .val small{font-size:14px;color:var(--muted);font-family:-apple-system,sans-serif;font-weight:500;margin-left:4px}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;
+    background:var(--peach);outline:none;margin:4px 0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--coral);border:3px solid var(--surface);box-shadow:0 2px 6px var(--shadow);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--coral);
+    border:3px solid var(--surface);box-shadow:0 2px 6px var(--shadow);cursor:pointer}
+  input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--coral-deep)}
+  .scaleticks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px}
+
+  .seg{display:flex;gap:6px;background:var(--peach);padding:5px;border-radius:12px}
+  .seg button{flex:1;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:600;
+    padding:9px 6px;border-radius:8px;cursor:pointer;transition:.12s}
+  .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px -3px var(--shadow)}
+  .seg button:focus-visible{outline:2px solid var(--coral)}
+
+  .toggle{display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;margin-top:4px}
+  .toggle input{position:absolute;opacity:0;width:0;height:0}
+  .switch{width:46px;height:26px;background:var(--peach);border-radius:999px;position:relative;flex:0 0 auto;transition:.15s;border:1px solid var(--line)}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:.15s}
+  .toggle input:checked + .switch{background:var(--coral)}
+  .toggle input:checked + .switch::after{transform:translateX(20px);background:#fff}
+  .toggle input:focus-visible + .switch{box-shadow:0 0 0 3px var(--coral-deep)}
+  .toggle .lbl{font-size:14px;font-weight:600}
+  .toggle .hint{display:block;font-size:12px;color:var(--muted);font-weight:400}
+
+  /* plot */
+  .plotwrap{position:relative;width:100%;aspect-ratio:1/.82;min-height:230px}
+  canvas{width:100%;height:100%;display:block;border-radius:12px}
+  .axtitle{font-size:12px;color:var(--muted);text-align:center;margin-top:6px}
+  .axY{position:absolute;left:-6px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:center;
+    font-size:12px;color:var(--muted);white-space:nowrap}
+
+  /* result */
+  .badge{border-radius:14px;padding:16px 18px;color:#fff;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .badge .cls{font-family:Georgia,serif;font-size:clamp(18px,2.4vw,23px);font-weight:700;line-height:1.1}
+  .badge .rd{font-size:13px;opacity:.92;font-weight:600}
+  .badge .pv{font-family:Georgia,serif;font-size:26px;font-weight:700;letter-spacing:.02em}
+
+  .rows{display:grid;gap:12px}
+  .rowc{background:var(--peach);border-radius:12px;padding:14px 16px}
+  .rowc .k{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral-deep);margin:0 0 6px}
+  .rowc .v{font-size:15px;margin:0;color:var(--ink)}
+  .rowc ul{margin:6px 0 0;padding-left:18px}
+  .rowc li{margin:3px 0;font-size:14.5px}
+  .meta-v{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--navy)}
+
+  .chip{display:inline-block;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;margin-top:2px}
+  .chip.strong{background:var(--coral);color:#fff}
+  .chip.weak{background:transparent;border:1.5px solid var(--coral);color:var(--coral-deep)}
+
+  .combos{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.45}
+  .combos b{color:var(--ink)}
+
+  footer{margin-top:20px;font-size:11.5px;color:var(--muted);line-height:1.5}
+  footer .disc{font-style:italic}
+  .tabs{display:flex;gap:8px;margin:0 0 18px;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:14px;font-weight:600;padding:10px 18px;border-radius:11px;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--coral);color:#fff;border-color:var(--coral)}
+  .tab:focus-visible{outline:2px solid var(--coral-deep);outline-offset:2px}
+  .view.hidden{display:none}
+  .bars{display:grid;gap:16px;margin-top:2px}
+  .bar-row .bl{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px;color:var(--ink);font-weight:600}
+  .bar-track{height:28px;border-radius:8px;background:var(--peach);overflow:hidden}
+  .bar-fill{height:100%;border-radius:8px;transition:width .18s ease}
+  .kpis{display:flex;gap:26px;align-items:flex-end;margin-top:22px;flex-wrap:wrap}
+  .big-nnt{font-family:Georgia,serif;font-size:60px;font-weight:700;color:var(--coral);line-height:1}
+  .nnt-unit{font-size:14px;color:var(--muted);margin-top:2px}
+  .insight{margin-top:18px;padding:14px 16px;border-radius:12px;font-size:14.5px;line-height:1.5}
+  .insight.hi{background:var(--coral-deep);color:#fff}
+  .insight.mid{background:var(--peach);color:var(--ink)}
+  .insight.lo{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">Diretriz Brasileira de Hipertensão Arterial 2025</p>
+      <h1 class="serif">Hipertensão Arterial 2025 na prática clínica</h1>
+      <p class="sub">Ferramenta de apoio à decisão em duas visões: classificação e conduta por pressão de consultório e risco; e benefício absoluto (redução absoluta de risco e NNT) da redução pressórica, segundo a Diretriz 2025.</p>
+    </div>
+    <button class="themebtn" id="themebtn" type="button">Tema claro / escuro</button>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Modos">
+    <button class="tab" role="tab" id="tabClass" aria-selected="true" aria-controls="view-class" type="button">Classificação e conduta</button>
+    <button class="tab" role="tab" id="tabNnt" aria-selected="false" aria-controls="view-nnt" type="button">Benefício absoluto e NNT</button>
+  </nav>
+
+  <section class="view" id="view-class">
+  <div class="grid">
+    <!-- CONTROLES -->
+    <section class="panel" aria-label="Parâmetros">
+      <h2>Parâmetros</h2>
+
+      <div class="ctrl">
+        <div class="ctrl-head">
+          <label for="pas">Pressão sistólica (PAS)</label>
+          <span class="val tnum"><span id="pasv">150</span><small>mmHg</small></span>
+        </div>
+        <input type="range" id="pas" min="90" max="220" step="1" value="150">
+        <div class="scaleticks tnum"><span>90</span><span>120</span><span>140</span><span>160</span><span>180</span><span>220</span></div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head">
+          <label for="pad">Pressão diastólica (PAD)</label>
+          <span class="val tnum"><span id="padv">95</span><small>mmHg</small></span>
+        </div>
+        <input type="range" id="pad" min="50" max="140" step="1" value="95">
+        <div class="scaleticks tnum"><span>50</span><span>80</span><span>90</span><span>100</span><span>110</span><span>140</span></div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><label id="risklbl">Risco cardiovascular</label></div>
+        <div class="seg" role="group" aria-labelledby="risklbl" id="risk">
+          <button type="button" data-v="baixo" aria-pressed="false">Baixo</button>
+          <button type="button" data-v="moderado" aria-pressed="false">Moderado</button>
+          <button type="button" data-v="alto" aria-pressed="true">Alto</button>
+        </div>
+      </div>
+
+      <div class="ctrl">
+        <label class="toggle">
+          <input type="checkbox" id="frail">
+          <span class="switch" aria-hidden="true"></span>
+          <span class="lbl">Idoso ≥ 80 anos ou frágil
+            <span class="hint">Individualiza a meta e favorece a monoterapia</span>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <!-- RESULTADO -->
+    <section class="panel" aria-live="polite">
+      <h2>Classificação e conduta</h2>
+
+      <div class="plotwrap">
+        <canvas id="plot" width="560" height="460"></canvas>
+      </div>
+      <p class="axtitle tnum">PAS (mmHg)</p>
+
+      <div class="badge" id="badge" style="background:var(--e1)">
+        <div>
+          <div class="cls" id="clsname">Hipertensão estágio 1</div>
+          <div class="rd" id="range">140–159 e/ou 90–99 mmHg</div>
+        </div>
+        <div class="pv tnum" id="pvbadge">150/95</div>
+      </div>
+
+      <div class="rows">
+        <div class="rowc">
+          <p class="k">Meta pressórica</p>
+          <p class="v meta-v" id="meta">&lt; 130/80 mmHg</p>
+        </div>
+        <div class="rowc">
+          <p class="k">Conduta</p>
+          <ul id="conduta"></ul>
+          <span class="chip strong" id="chip">Recomendação FORTE · certeza moderada</span>
+          <p class="combos" id="combos"><b>Associações preferenciais:</b> BRA ou IECA + BCC ou diurético tiazídico, preferencialmente em dose fixa.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+  </section>
+
+  <section class="view hidden" id="view-nnt">
+   <div class="grid">
+    <section class="panel" aria-label="Cenário do paciente">
+      <h2>Cenário do paciente</h2>
+      <div class="ctrl">
+        <div class="ctrl-head"><label id="deslbl">Desfecho</label></div>
+        <div class="seg" role="group" aria-labelledby="deslbl" id="des">
+          <button type="button" data-r="0.20" aria-pressed="true">Eventos CV</button>
+          <button type="button" data-r="0.33" aria-pressed="false">AVC</button>
+          <button type="button" data-r="0.17" aria-pressed="false">DAC</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="risk0">Risco basal do desfecho em 10 anos</label><span class="val tnum"><span id="r0v">15</span><small>%</small></span></div>
+        <input type="range" id="risk0" min="1" max="40" step="1" value="15">
+        <div class="scaleticks tnum"><span>1</span><span>5</span><span>7,5</span><span>20</span><span>40</span></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="drop">Redução planejada da PAS</label><span class="val tnum"><span id="dv">15</span><small>mmHg</small></span></div>
+        <input type="range" id="drop" min="0" max="25" step="1" value="15">
+        <div class="scaleticks tnum"><span>0</span><span>10</span><span>15</span><span>20</span><span>25</span></div>
+      </div>
+      <p class="combos" style="margin-top:8px">Reduções relativas por 10 mmHg: eventos CV cerca de 20%, AVC cerca de 33%, DAC cerca de 17% (Figura 7.1 e metanálises). Modelo log-linear, para fins didáticos.</p>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <h2>Impacto absoluto</h2>
+      <div class="bars">
+        <div class="bar-row">
+          <div class="bl"><span>Risco sem tratar</span><span class="tnum" id="rb">15,0%</span></div>
+          <div class="bar-track"><div class="bar-fill" id="barB" style="width:37%;background:var(--e2)"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bl"><span>Risco com tratamento</span><span class="tnum" id="rt">11,4%</span></div>
+          <div class="bar-track"><div class="bar-fill" id="barT" style="width:28%;background:var(--normal)"></div></div>
+        </div>
+      </div>
+      <div class="kpis">
+        <div><div class="big-nnt tnum" id="nnt">28</div><div class="nnt-unit">NNT em 10 anos</div></div>
+        <div><div class="meta-v tnum" id="arr" style="font-size:30px">3,6 pp</div><div class="nnt-unit">redução absoluta de risco</div></div>
+      </div>
+      <div class="insight mid" id="insight">Em 100 pacientes tratados por 10 anos, cerca de 3,6 eventos evitados.</div>
+    </section>
+   </div>
+  </section>
+
+  <footer>
+    <p>Elaborado por <b>Dra. Thaís Giunco Alexandre</b>, Médica de Família e Comunidade (CRM-SP 135.408), Preceptora da Faculdade de Ciências Médicas da Santa Casa de São Paulo.</p>
+    <p>Baseado na <b>Diretriz Brasileira de Hipertensão Arterial 2025</b> (Quadro 3.2, classificação de consultório a partir de 18 anos; Seções 5 e 7, início de tratamento e metas). Arq Bras Cardiol. 2025;122(9):e20250624.</p>
+    <p class="disc">Ferramenta educativa de apoio à discussão. Não substitui a avaliação individual nem o julgamento clínico.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var pas=150, pad=95, risco='alto', frail=false;
+  var STAGES={
+    normal:{name:'PA normal',        range:'PAS &lt; 120 e PAD &lt; 80 mmHg',       varc:'--normal'},
+    pre:   {name:'Pré-hipertensão',  range:'120–139 e/ou 80–89 mmHg',              varc:'--pre'},
+    e1:    {name:'Hipertensão estágio 1', range:'140–159 e/ou 90–99 mmHg',         varc:'--e1'},
+    e2:    {name:'Hipertensão estágio 2', range:'160–179 e/ou 100–109 mmHg',       varc:'--e2'},
+    e3:    {name:'Hipertensão estágio 3', range:'≥ 180 e/ou ≥ 110 mmHg',           varc:'--e3'}
+  };
+  var ORDER=['normal','pre','e1','e2','e3'];
+  function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+
+  function stageOf(p,d){
+    var sp = p>=180?4 : p>=160?3 : p>=140?2 : p>=120?1 : 0;
+    var dp = d>=110?4 : d>=100?3 : d>=90?2  : d>=80?1  : 0;
+    return ORDER[Math.max(sp,dp)];
+  }
+
+  function conduct(cls){
+    var meta, cond=[], chip=null, showCombos=false;
+    if(cls==='normal'){
+      meta='Sem meta terapêutica';
+      cond=['Pressão arterial normal.','Reavaliação periódica e estímulo a hábitos saudáveis.'];
+    } else if(cls==='pre'){
+      var drugEligible = (pas>=130 || pad>=80); // subgrupo 130–139/80–89
+      cond=['Medidas não farmacológicas para todos.'];
+      if(risco==='alto' && drugEligible){
+        meta='&lt; 130/80 mmHg';
+        cond.push('Alto risco: iniciar monoterapia após 3 meses de MNM, se não controlar.');
+        chip={t:'Recomendação FRACA · certeza baixa', k:'weak'};
+      } else {
+        meta='Foco em medidas não farmacológicas';
+        cond.push('Sem indicação de tratamento medicamentoso no momento.');
+      }
+    } else {
+      meta = frail ? 'Valor máximo tolerado (individualizar)' : '&lt; 130/80 mmHg';
+      if(cls==='e1'){
+        cond=['Iniciar tratamento medicamentoso (o diagnóstico já indica).'];
+        if(frail || risco==='baixo'){
+          cond.push(frail ? 'Idoso ou frágil: monoterapia, com titulação cautelosa.'
+                          : 'Estágio 1 de baixo risco: monoterapia aceitável, a critério médico.');
+          chip={t:'Recomendação FRACA · certeza baixa', k:'weak'};
+        } else {
+          cond.push('Iniciar com combinação dupla em dose baixa.');
+          chip={t:'Recomendação FORTE · certeza moderada', k:'strong'}; showCombos=true;
+        }
+      } else if(cls==='e2'){
+        cond=['Iniciar com combinação dupla em dose baixa.'];
+        if(frail) cond.push('No idoso frágil, individualizar e titular com cautela.');
+        chip={t:'Recomendação FORTE · certeza moderada', k:'strong'}; showCombos=true;
+      } else {
+        cond=['Iniciar combinação dupla de imediato.','Avaliar sinais de urgência ou emergência hipertensiva.'];
+        chip={t:'Recomendação FORTE · certeza moderada', k:'strong'}; showCombos=true;
+      }
+    }
+    return {meta:meta, cond:cond, chip:chip, showCombos:showCombos};
+  }
+
+  // ---- plot ----
+  var cv=document.getElementById('plot'), ctx=cv.getContext('2d');
+  var PASMIN=90,PASMAX=220,PADMIN=50,PADMAX=140;
+  function draw(){
+    var dpr=window.devicePixelRatio||1;
+    var w=cv.clientWidth, h=cv.clientHeight;
+    if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    var padL=54,padB=30,padT=10,padR=10;
+    var pw=w-padL-padR, ph=h-padT-padB;
+    function X(p){return padL + (p-PASMIN)/(PASMAX-PASMIN)*pw;}
+    function Y(d){return padT + (PADMAX-d)/(PADMAX-PADMIN)*ph;}
+    // zones (max rule): fill by cells
+    var colors={normal:cssv('--normal'),pre:cssv('--pre'),e1:cssv('--e1'),e2:cssv('--e2'),e3:cssv('--e3')};
+    var step=5;
+    for(var p=PASMIN;p<PASMAX;p+=step){
+      for(var d=PADMIN;d<PADMAX;d+=step){
+        var st=stageOf(p+step/2,d+step/2);
+        ctx.fillStyle=colors[st];
+        ctx.globalAlpha=0.82;
+        var x0=X(p),x1=X(p+step),y1=Y(d),y0=Y(d+step);
+        ctx.fillRect(x0,y0,(x1-x0)+0.6,(y1-y0)+0.6);
+      }
+    }
+    ctx.globalAlpha=1;
+    // boundary lines at 120/140/160/180 (PAS) and 80/90/100/110 (PAD)
+    ctx.strokeStyle=cssv('--surface'); ctx.lineWidth=1;
+    [120,140,160,180].forEach(function(p){ctx.beginPath();ctx.moveTo(X(p),padT);ctx.lineTo(X(p),padT+ph);ctx.stroke();});
+    [80,90,100,110].forEach(function(d){ctx.beginPath();ctx.moveTo(padL,Y(d));ctx.lineTo(padL+pw,Y(d));ctx.stroke();});
+    // axis ticks
+    ctx.fillStyle=cssv('--muted'); ctx.font='11px -apple-system,Helvetica,Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    [90,120,140,160,180,220].forEach(function(p){ctx.fillText(p,X(p),padT+ph+7);});
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    [60,80,90,100,110,130].forEach(function(d){ctx.fillText(d,padL-8,Y(d));});
+    // título do eixo Y (rotacionado na canaleta esquerda)
+    ctx.save(); ctx.translate(13, padT+ph/2); ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle=cssv('--muted');
+    ctx.fillText('PAD (mmHg)',0,0); ctx.restore();
+    // crosshair + dot
+    var cx=X(Math.max(PASMIN,Math.min(PASMAX,pas))), cy=Y(Math.max(PADMIN,Math.min(PADMAX,pad)));
+    ctx.strokeStyle=cssv('--dot-ring'); ctx.globalAlpha=.35; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(padL,cy);ctx.lineTo(cx,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,padT+ph);ctx.lineTo(cx,cy);ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha=1;
+    ctx.beginPath();ctx.arc(cx,cy,9,0,6.2832);ctx.fillStyle='#fff';ctx.fill();
+    ctx.lineWidth=3;ctx.strokeStyle=cssv('--dot-ring');ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy,4,0,6.2832);ctx.fillStyle=cssv('--dot-ring');ctx.fill();
+  }
+
+  function render(){
+    var cls=stageOf(pas,pad), S=STAGES[cls], r=conduct(cls);
+    document.getElementById('pasv').textContent=pas;
+    document.getElementById('padv').textContent=pad;
+    document.getElementById('pvbadge').textContent=pas+'/'+pad;
+    var badge=document.getElementById('badge');
+    badge.style.background='var('+S.varc+')';
+    document.getElementById('clsname').textContent=S.name;
+    document.getElementById('range').innerHTML=S.range;
+    document.getElementById('meta').innerHTML=r.meta;
+    var ul=document.getElementById('conduta'); ul.innerHTML='';
+    r.cond.forEach(function(t){var li=document.createElement('li');li.textContent=t;ul.appendChild(li);});
+    var chip=document.getElementById('chip');
+    if(r.chip){chip.style.display='inline-block';chip.textContent=r.chip.t;chip.className='chip '+r.chip.k;}
+    else{chip.style.display='none';}
+    document.getElementById('combos').style.display=r.showCombos?'block':'none';
+    draw();
+  }
+
+  document.getElementById('pas').addEventListener('input',function(e){pas=+e.target.value;render();});
+  document.getElementById('pad').addEventListener('input',function(e){pad=+e.target.value;render();});
+  document.getElementById('frail').addEventListener('change',function(e){frail=e.target.checked;render();});
+  Array.prototype.forEach.call(document.querySelectorAll('#risk button'),function(b){
+    b.addEventListener('click',function(){
+      risco=b.getAttribute('data-v');
+      Array.prototype.forEach.call(document.querySelectorAll('#risk button'),function(x){x.setAttribute('aria-pressed', x===b?'true':'false');});
+      render();
+    });
+  });
+
+  // ---- aba Benefício absoluto e NNT ----
+  var rrr10=0.20, risk0=15, drop=15, curView='class';
+  function fmt(x){return x.toFixed(1).replace('.',',');}
+  function renderNnt(){
+    var rrr = 1 - Math.pow(1-rrr10, drop/10);
+    var rt = risk0*(1-rrr);
+    var arr = risk0 - rt;
+    document.getElementById('r0v').textContent=risk0;
+    document.getElementById('dv').textContent=drop;
+    document.getElementById('rb').textContent=fmt(risk0)+'%';
+    document.getElementById('rt').textContent=fmt(rt)+'%';
+    var maxR=40;
+    document.getElementById('barB').style.width=Math.min(100,risk0/maxR*100)+'%';
+    document.getElementById('barT').style.width=Math.min(100,rt/maxR*100)+'%';
+    document.getElementById('arr').textContent=fmt(arr)+' pp';
+    var nnt = arr>0 ? Math.round(100/arr) : Infinity;
+    document.getElementById('nnt').textContent = isFinite(nnt)? nnt : '—';
+    var ins=document.getElementById('insight');
+    var evt='Em 100 pacientes tratados por 10 anos, cerca de '+fmt(arr)+' eventos evitados.';
+    if(drop===0){ins.className='insight lo';ins.textContent='Sem redução da PA, não há benefício estimado.';}
+    else if(arr>=5){ins.className='insight hi';ins.textContent=evt+' Alto risco: benefício absoluto expressivo, NNT baixo.';}
+    else if(arr>=2){ins.className='insight mid';ins.textContent=evt+' Benefício absoluto moderado.';}
+    else {ins.className='insight lo';ins.textContent=evt+' Baixo risco: o mesmo benefício relativo rende um ganho absoluto pequeno, com NNT alto.';}
+  }
+  function showView(w){
+    curView=w;
+    document.getElementById('view-class').classList.toggle('hidden', w!=='class');
+    document.getElementById('view-nnt').classList.toggle('hidden', w!=='nnt');
+    document.getElementById('tabClass').setAttribute('aria-selected', w==='class');
+    document.getElementById('tabNnt').setAttribute('aria-selected', w==='nnt');
+    if(w==='class') draw(); else renderNnt();
+  }
+  document.getElementById('tabClass').addEventListener('click',function(){showView('class');});
+  document.getElementById('tabNnt').addEventListener('click',function(){showView('nnt');});
+  document.getElementById('risk0').addEventListener('input',function(e){risk0=+e.target.value;renderNnt();});
+  document.getElementById('drop').addEventListener('input',function(e){drop=+e.target.value;renderNnt();});
+  Array.prototype.forEach.call(document.querySelectorAll('#des button'),function(b){
+    b.addEventListener('click',function(){
+      rrr10=parseFloat(b.getAttribute('data-r'));
+      Array.prototype.forEach.call(document.querySelectorAll('#des button'),function(x){x.setAttribute('aria-pressed', x===b?'true':'false');});
+      renderNnt();
+    });
+  });
+
+  // theme toggle (para exibição fora do host de artifact)
+  document.getElementById('themebtn').addEventListener('click',function(){
+    var root=document.documentElement;
+    var cur=root.getAttribute('data-theme');
+    var isDark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    root.setAttribute('data-theme', isDark?'light':'dark');
+    if(curView==='nnt') renderNnt(); else render();
+  });
+  window.addEventListener('resize',function(){ if(curView==='class') draw(); });
+  render(); renderNnt();
+})();
+</script>
+</body>
+</html>
