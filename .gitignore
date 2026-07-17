@@ -1,0 +1,4 @@
+# Fontes locais que NAO devem ir para o repo publico:
+build/
+tool_original.html
+*.log
