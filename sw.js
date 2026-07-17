@@ -1,5 +1,5 @@
 /* Service worker: cache app shell para uso offline (consultório) */
-const CACHE = "classificador-pa-2025-v2";
+const CACHE = "classificador-pa-2025-v3";
 const ASSETS = [
   "./",
   "./index.html",
